@@ -1,27 +1,32 @@
-import { databases } from '@/appwrite';
-import { getTodosGroupedByColumn } from '@/lib/getTodosGroupedByColumn';
-import { create } from 'zustand'
+import { databases } from "@/appwrite";
+import { getTodosGroupedByColumn } from "@/lib/getTodosGroupedByColumn";
+import { create } from "zustand";
 
-interface BoardState{
-    board:Board;
-    getBoard: () => void;
-    setBoardState: (board: Board) => void;
-    updateTodoInDB: (todo: Todo, columnId: TypedColumn) => void;
+interface BoardState {
+  board: Board;
+  getBoard: () => void;
+  setBoardState: (board: Board) => void;
+  updateTodoInDB: (todo: Todo, columnId: TypedColumn) => void;
+
+  searchString: string;
+  setSearchString: (searchString: string) => void;
 }
 
 export const useBoardStore = create<BoardState>((set) => ({
   board: {
-    columns: new Map<TypedColumn, Column>()
+    columns: new Map<TypedColumn, Column>(),
   },
+  searchString: "",
+  setSearchString: (searchString) => set({ searchString }),
 
-  getBoard: async()=>{
+  getBoard: async () => {
     const board = await getTodosGroupedByColumn();
-    set({board});
+    set({ board });
   },
 
-  setBoardState: (board)=> set({board}),
+  setBoardState: (board) => set({ board }),
 
-  updateTodoInDB: async (todo, columnId)=>{
+  updateTodoInDB: async (todo, columnId) => {
     await databases.updateDocument(
       process.env.NEXT_PUBLIC_DATABASE_ID!,
       process.env.NEXT_PUBLIC_TODOS_COLLECTION_ID!,
@@ -30,8 +35,8 @@ export const useBoardStore = create<BoardState>((set) => ({
         title: todo.title,
         status: columnId,
         description: todo.description,
-        ...(todo.image && {image: JSON.stringify(todo.image)}) 
+        ...(todo.image && { image: JSON.stringify(todo.image) }),
       }
-    )
-  }
-})) 
+    );
+  },
+}));

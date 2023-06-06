@@ -1,24 +1,24 @@
-interface Board{
-    columns: Map<TypedColumn, Column>;
+interface Board {
+  columns: Map<TypedColumn, Column>;
 }
 
-type TypedColumn = 'todo'|'inprogress'|'completed';
+type TypedColumn = "todo" | "inprogress" | "completed";
 
-interface Column{
-    id: TypedColumn;
-    todos: Todo[];
+interface Column {
+  id: TypedColumn;
+  todos: Todo[];
 }
 
-interface Todo{
-    $id: string;
-    $createdAt: string;
-    title: string;
-    status: TypedColumn;
-    description: string;
-    image?: Image;
+interface Todo {
+  $id: string;
+  $createdAt: string;
+  title: string;
+  status: TypedColumn;
+  description: string;
+  image?: Image;
 }
 
-interface Image{
-    bucketId: string;
-    fileId: string;
+interface Image {
+  bucketId: string;
+  fileId: string;
 }
