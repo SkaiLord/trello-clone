@@ -5,7 +5,7 @@ import { json } from "stream/consumers";
 export async function POST(request: Request) {
   //todos in body of the POST req
   const { todos } = await request.json();
-  console.log(todos);
+  // console.log(todos);
 
   //connect with openAI GPT
   const response = await openai.createChatCompletion({
