@@ -44,10 +44,10 @@ function Header() {
           height={100}
           className="w-44 md:w-56 pb-10 md:pb-0 object-contain"
         />
-        <div className="flex items-center gap-x-5 flex-1 justify-end w-full">
+        <div className="flex items-center gap-x-5 flex-1 md:justify-end justify-center w-full">
           {/* Search Bar */}
-          <form className="flex items-center gap-x-5 bg-white rounded-md p-2 shadow-md flex-1 md:flex-initial">
-            <MagnifyingGlassIcon className="h-6 w-6 text-gray-400" />
+          <form className="flex items-center md:gap-x-5 bg-white rounded-md p-2 shadow-md flex-1 md:flex-initial md:h-auto h-12">
+            <MagnifyingGlassIcon className="md:h-6 md:w-6 h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search"
@@ -61,7 +61,13 @@ function Header() {
           </form>
 
           {/* Avatar */}
-          <Avatar name="Sahir Khan" round size="50" color="#0055D1" />
+          <Avatar
+            className="md:w-[50px] md:h-[50px] w-[40px] h-[40px] "
+            name="Sahir Khan"
+            round
+            size="50"
+            color="#0055D1"
+          />
         </div>
       </div>
 
