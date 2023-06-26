@@ -1,13 +1,22 @@
 import { create } from "zustand";
 
 interface ModalState {
-  isOpen: boolean;
-  openModal: () => void;
-  closeModal: () => void;
+  isCreateOpen: boolean;
+  isViewOpen: boolean;
+  isEditOpen: boolean;
+
+  openCreateModal: () => void;
+  closeCreateModal: () => void;
+  openViewModal: () => void;
+  closeViewModal: () => void;
 }
 
 export const useModalStore = create<ModalState>((set) => ({
-  isOpen: false,
-  openModal: () => set({ isOpen: true }),
-  closeModal: () => set({ isOpen: false }),
+  isCreateOpen: false,
+  isViewOpen: false,
+  isEditOpen: false,
+  openCreateModal: () => set({ isCreateOpen: true }),
+  closeCreateModal: () => set({ isCreateOpen: false }),
+  openViewModal: () => set({ isViewOpen: true }),
+  closeViewModal: () => set({ isViewOpen: false }),
 }));

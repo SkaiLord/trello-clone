@@ -23,11 +23,11 @@ function Column({ id, todos, index }: Props) {
     state.searchString,
     state.setNewTaskType,
   ]);
-  const [openModal] = useModalStore((state) => [state.openModal]);
+  const [openCreateModal] = useModalStore((state) => [state.openCreateModal]);
 
   const handleAddTodo = () => {
     setNewTaskType(id);
-    openModal();
+    openCreateModal();
   };
 
   return (

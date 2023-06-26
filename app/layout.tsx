@@ -1,5 +1,6 @@
-import Modal from "@/components/Modal";
+import CreateModal from "@/components/CreateModal";
 import "./globals.css";
+import ViewModal from "@/components/ViewModal";
 
 export const metadata = {
   title: "Trello Clone",
@@ -15,7 +16,8 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-[#F5F6F8]">
         {children}
-        <Modal />
+        <CreateModal />
+        <ViewModal />
       </body>
     </html>
   );

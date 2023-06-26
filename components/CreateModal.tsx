@@ -8,10 +8,10 @@ import TaskTypeRadioGroup from "./TaskTypeRadioGroup";
 import Image from "next/image";
 import { PhotoIcon } from "@heroicons/react/24/solid";
 
-function Modal() {
-  const [isOpen, closeModal] = useModalStore((state) => [
-    state.isOpen,
-    state.closeModal,
+function CreateModal() {
+  const [isCreateOpen, closeCreateModal] = useModalStore((state) => [
+    state.isCreateOpen,
+    state.closeCreateModal,
   ]);
 
   const [addTask, newTaskInput, setNewTaskInput, newTaskType, image, setImage] =
@@ -34,16 +34,16 @@ function Modal() {
     addTask(newTaskInput, newTaskType, image);
     // initialise to default-zero
     setImage(null);
-    closeModal();
+    closeCreateModal();
   };
 
   return (
     // Use the `Transition` component at the root level
-    <Transition appear show={isOpen} as={Fragment}>
+    <Transition appear show={isCreateOpen} as={Fragment}>
       <Dialog
         as="form"
         className="relative z-10"
-        onClose={closeModal}
+        onClose={closeCreateModal}
         onSubmit={handleSubmit}
       >
         {/*
@@ -150,4 +150,4 @@ function Modal() {
   );
 }
 
-export default Modal;
+export default CreateModal;
