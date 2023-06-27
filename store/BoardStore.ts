@@ -23,6 +23,12 @@ interface BoardState {
 
   addTask: (todo: string, columnId: TypedColumn, image?: File | null) => void;
   deleteTask: (taskIndex: number, todo: Todo, id: TypedColumn) => void;
+  editTask: (
+    task: Todo,
+    todo: string,
+    columnId: TypedColumn,
+    image?: File | null
+  ) => void;
 }
 
 export const useBoardStore = create<BoardState>((set, get) => ({
@@ -122,6 +128,57 @@ export const useBoardStore = create<BoardState>((set, get) => ({
       process.env.NEXT_PUBLIC_TODOS_COLLECTION_ID!,
       todo.$id
     );
+  },
+
+  editTask: async (
+    task: Todo,
+    todo: string,
+    columnId: TypedColumn,
+    image?: File | null
+  ) => {
+    let file: Image | undefined;
+    //updating image
+    if (task.image && image) {
+      await storage.deleteFile(task.image.bucketId, task.image.fileId);
+      const fileUploaded = await uploadImage(image);
+      if (fileUploaded) {
+        file = {
+          bucketId: fileUploaded.bucketId,
+          fileId: fileUploaded.$id,
+        };
+      }
+    }
+    // uploaded image not exists but previous image exist
+    else if (task.image && !image) {
+      await storage.deleteFile(task.image.bucketId, task.image.fileId);
+    }
+    // uploading an image but no previous image
+    else if (!task.image && image) {
+      const fileUploaded = await uploadImage(image);
+      if (fileUploaded) {
+        file = {
+          bucketId: fileUploaded.bucketId,
+          fileId: fileUploaded.$id,
+        };
+      }
+    }
+    // Update todo in database
+    await databases.updateDocument(
+      process.env.NEXT_PUBLIC_DATABASE_ID!,
+      process.env.NEXT_PUBLIC_TODOS_COLLECTION_ID!,
+      task.$id,
+      {
+        $createdAt: new Date().toISOString(),
+        title: todo,
+        status: columnId,
+        // description: todo.description,
+        ...(file && { image: JSON.stringify(file) }),
+      }
+    );
+
+    set({ newTaskInput: "" });
+    const board = await getTodosGroupedByColumn();
+    set({ board });
   },
 
   updateTodoInDB: async (todo, columnId) => {

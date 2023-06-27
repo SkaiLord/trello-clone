@@ -3,7 +3,11 @@
 import getUrl from "@/lib/getUrl";
 import { useBoardStore } from "@/store/BoardStore";
 import { useModalStore } from "@/store/ModalStore";
-import { EyeIcon, XCircleIcon } from "@heroicons/react/24/solid";
+import {
+  EyeIcon,
+  PencilSquareIcon,
+  XCircleIcon,
+} from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
@@ -28,12 +32,19 @@ function TodoCard({
   draggableProps,
   dragHandleProps,
 }: Props) {
-  const [deleteTask, setTask] = useBoardStore((state) => [
-    state.deleteTask,
-    state.setTask,
-  ]);
+  const [setNewTaskInput, setNewTaskType, setImage, deleteTask, setTask] =
+    useBoardStore((state) => [
+      state.setNewTaskInput,
+      state.setNewTaskType,
+      state.setImage,
+      state.deleteTask,
+      state.setTask,
+    ]);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [openViewModal] = useModalStore((state) => [state.openViewModal]);
+  const [openViewModal, openEditModel] = useModalStore((state) => [
+    state.openViewModal,
+    state.openEditModal,
+  ]);
 
   useEffect(() => {
     if (todo.image) {
@@ -52,6 +63,14 @@ function TodoCard({
     openViewModal();
   };
 
+  const handleEditTodo = () => {
+    setTask(todo);
+    setNewTaskInput(todo.title);
+    setNewTaskType(todo.status);
+    // setImage(imageUrl);
+    openEditModel();
+  };
+
   return (
     <div
       {...draggableProps}
@@ -62,18 +81,24 @@ function TodoCard({
       {/* Todo header */}
       <div className="flex justify-between items-center p-5">
         <p>{todo.title}</p>
-        <div className="flex justify-end items-center">
+        <div className="flex justify-end lg:gap-x-4 sm:gap-x-2 items-center">
           <button
             onClick={handleViewTodo}
             className="text-slate-500 hover:text-slate-600"
           >
-            <EyeIcon className="ml-5 h-8 w-8" />
+            <EyeIcon className="h-8 w-8" />
+          </button>
+          <button
+            onClick={handleEditTodo}
+            className="text-blue-500 hover:text-blue-600"
+          >
+            <PencilSquareIcon className="h-6 w-6" />
           </button>
           <button
             onClick={() => deleteTask(index, todo, id)}
             className="text-red-500 hover:text-red-600"
           >
-            <XCircleIcon className="ml-5 h-8 w-8" />
+            <XCircleIcon className="h-8 w-8" />
           </button>
         </div>
       </div>

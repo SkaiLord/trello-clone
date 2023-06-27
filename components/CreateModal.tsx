@@ -1,30 +1,65 @@
 "use client";
 
-import { FormEvent, Fragment, useRef } from "react";
+import {
+  FormEvent,
+  Fragment,
+  MouseEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useModalStore } from "@/store/ModalStore";
 import { useBoardStore } from "@/store/BoardStore";
 import TaskTypeRadioGroup from "./TaskTypeRadioGroup";
 import Image from "next/image";
 import { PhotoIcon } from "@heroicons/react/24/solid";
+import getUrl from "@/lib/getUrl";
 
 function CreateModal() {
-  const [isCreateOpen, closeCreateModal] = useModalStore((state) => [
-    state.isCreateOpen,
-    state.closeCreateModal,
-  ]);
-
-  const [addTask, newTaskInput, setNewTaskInput, newTaskType, image, setImage] =
-    useBoardStore((state) => [
-      state.addTask,
-      state.newTaskInput,
-      state.setNewTaskInput,
-      state.newTaskType,
-      state.image,
-      state.setImage,
+  const [isCreateOpen, isEditOpen, closeCreateModal, closeEditModal] =
+    useModalStore((state) => [
+      state.isCreateOpen,
+      state.isEditOpen,
+      state.closeCreateModal,
+      state.closeEditModal,
     ]);
 
+  const [
+    task,
+    addTask,
+    editTask,
+    newTaskInput,
+    setNewTaskInput,
+    newTaskType,
+    image,
+    setImage,
+  ] = useBoardStore((state) => [
+    state.task,
+    state.addTask,
+    state.editTask,
+    state.newTaskInput,
+    state.setNewTaskInput,
+    state.newTaskType,
+    state.image,
+    state.setImage,
+  ]);
+
   const imagePickerRef = useRef<HTMLInputElement>(null);
+
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (task.image) {
+      const fetchImage = async () => {
+        const url = await getUrl(task.image!);
+        if (url) {
+          setImageUrl(url.toString());
+        }
+      };
+      fetchImage();
+    }
+  }, [task]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,13 +72,34 @@ function CreateModal() {
     closeCreateModal();
   };
 
+  const handleEditSubmit = (
+    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
+  ) => {
+    e.preventDefault();
+    editTask(task, newTaskInput, newTaskType, image);
+    setImage(null);
+    setImageUrl(null);
+    closeEditModal();
+  };
+
+  const handleCancel = (
+    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
+  ) => {
+    e.preventDefault();
+    setNewTaskInput("");
+    setImage(null);
+    setImageUrl(null);
+    if (isCreateOpen) closeCreateModal();
+    else closeEditModal();
+  };
+
   return (
     // Use the `Transition` component at the root level
-    <Transition appear show={isCreateOpen} as={Fragment}>
+    <Transition appear show={isCreateOpen || isEditOpen} as={Fragment}>
       <Dialog
         as="form"
         className="relative z-10"
-        onClose={closeCreateModal}
+        onClose={isCreateOpen ? closeCreateModal : closeEditModal}
         onSubmit={handleSubmit}
       >
         {/*
@@ -120,6 +176,18 @@ function CreateModal() {
                       }}
                     />
                   )}
+                  {imageUrl && (
+                    <Image
+                      alt="Uploaded Image"
+                      width={200}
+                      height={200}
+                      className="w-full h-44 object-cover mt-2 filter transition-all duration-150 cursor-not-allowed hover:grayscale"
+                      src={imageUrl}
+                      onClick={() => {
+                        setImageUrl(null);
+                      }}
+                    />
+                  )}
                   <input
                     type="file"
                     ref={imagePickerRef}
@@ -132,13 +200,32 @@ function CreateModal() {
                   />
                 </div>
                 {/* Add task button */}
-                <div className="mt-4">
+                <div className="mt-4 flex justify-between">
                   <button
                     type="submit"
                     disabled={!newTaskInput}
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:bg-gray-100 disabled:text-gray-300 disabled:cursor-not-allowed"
+                    className={`${
+                      isEditOpen ? "hidden" : "flex"
+                    } justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:bg-gray-100 disabled:text-gray-300 disabled:cursor-not-allowed`}
                   >
                     Add Task
+                  </button>
+                  <button
+                    onClick={handleEditSubmit}
+                    disabled={!isEditOpen}
+                    className={`${
+                      isEditOpen ? "flex" : "hidden"
+                    } justify-center rounded-md border border-transparent bg-emerald-100 px-4 py-2 text-sm font-medium text-emerald-900 hover:bg-emerald-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:bg-gray-100 disabled:text-gray-300 disabled:cursor-not-allowed`}
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="reset"
+                    onClick={handleCancel}
+                    disabled={!newTaskInput}
+                    className="flex justify-center rounded-md border border-transparent bg-red-100 px-4 py-2 text-sm font-medium text-red-900 hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 disabled:bg-gray-100 disabled:text-gray-300 disabled:cursor-not-allowed"
+                  >
+                    Cancel
                   </button>
                 </div>
               </Dialog.Panel>
